@@ -1,4 +1,3 @@
--- liquibase formatted sql
 
 -- changeset xiaozhi:202512041515
 CREATE TABLE ai_agent_context_provider (
