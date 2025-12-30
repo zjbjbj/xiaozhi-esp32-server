@@ -7,7 +7,7 @@
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
     
     <!-- 定义日志文件存储位置 -->
-    <property name="LOG_HOME" value="./logs" />
+    <property name="LOG_HOME" value="/www/wwwroot/adminlog" />
     
     <!-- 使用自定义的初始化监听器确保日志目录存在 -->
     <define name="LOGBACK_DIR_CHECK" class="ch.qos.logback.core.property.FileExistsPropertyDefiner">
