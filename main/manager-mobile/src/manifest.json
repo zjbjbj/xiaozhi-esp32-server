@@ -1,5 +1,5 @@
 {
-  "name": "小智",
+  "name": "小A",
   "appid": "__UNI__36A515E",
   "description": "",
   "versionName": "1.0.0",
@@ -119,6 +119,8 @@
   },
   "vueVersion": "3",
   "h5": {
-    "router": {}
+    "router": {
+      "base": "/h5/"
+    }
   }
 }
