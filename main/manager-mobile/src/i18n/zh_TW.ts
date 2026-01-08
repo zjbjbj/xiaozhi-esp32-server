@@ -261,7 +261,7 @@ export default {
   'settings.restartLater': '稍後',
   // 關於我們
   'settings.aboutApp': '關於小A智控台',
-  'settings.aboutContent': '小A智控台\n\n 上海掘金鼠信息科技有限公司 為小智ESP32智能硬體提供設備管理、智能體配置等功能。\n\n© 2026 xiaoia-server {version}',
+  'settings.aboutContent': '上海掘金鼠信息科技有限公司\n\n  為小智ESP32智能硬體提供設備管理、智能體配置等功能。\n\n© 2026 xiaoia-server {version}',
   'settings.restartSuccess': '已保存，可稍後手動重啟應用',
   'settings.serverUrlSavedAndCacheCleared': '服務端地址已保存，緩存已清除',
   'settings.resetToDefaultAndCacheCleared': '已恢復默認設置，緩存已清除',
