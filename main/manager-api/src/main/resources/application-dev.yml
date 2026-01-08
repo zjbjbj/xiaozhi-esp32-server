@@ -3,8 +3,8 @@ knife4j:
   enable: true
   basic:
     enable: false
-    username: renren
-    password: 2ZABCDEUgF
+    username: xioaia
+    password: zaq12wsx
   setting:
     enableFooter: false
 spring:
