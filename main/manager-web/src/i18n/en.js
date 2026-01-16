@@ -297,7 +297,7 @@ export default {
 
   // Register page related
   'register.title': 'Create Account',
-  'register.welcome': 'Welcome to XiaoZhi AI',
+  'register.welcome': 'Welcome to XiaoA AI',
   'register.usernamePlaceholder': 'Please enter username',
   'register.mobilePlaceholder': 'Please enter mobile phone number',
   'register.captchaPlaceholder': 'Please enter captcha',
@@ -533,7 +533,7 @@ export default {
   'button.close': 'Close',
 
   // System information
-  'system.name': 'XiaoZhi Service',
+  'system.name': 'XiaoA Service',
 
   // Voiceprint related
   'voiceprint.management': 'Voiceprint Management',
@@ -665,7 +665,7 @@ export default {
 
   // Home page text
   'home.addAgent': 'Add Agent',
-  'home.greeting': 'Hi XiaoZhi',
+  'home.greeting': 'Hi XiaoA',
   'home.wish': "Let's have a wonderful day!",
   'home.languageModel': 'LLM',
   'home.voiceModel': 'TTS',
