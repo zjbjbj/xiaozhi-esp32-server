@@ -1,5 +1,5 @@
 // UI控制模块
-import { loadConfig, saveConfig, getConfig } from '../config/manager.js';
+import { loadConfig, saveConfig } from '../config/manager.js';
 import { getAudioRecorder } from '../core/audio/recorder.js';
 import { getWebSocketHandler } from '../core/network/websocket.js';
 import { getAudioPlayer } from '../core/audio/player.js';
@@ -11,7 +11,6 @@ class UIController {
         this.visualizerCanvas = null;
         this.visualizerContext = null;
         this.audioStatsTimer = null;
-        this.wsTimer = null;
         this.currentBackgroundIndex = 0;
         this.backgroundImages = ['1.png', '2.png', '3.png'];
 
@@ -93,6 +92,7 @@ class UIController {
                 if (isConnected) {
                     wsHandler.disconnect();
                     this.updateDialButton(false);
+                    this.addChatMessage('已断开连接，期待下次再见~😉', false);
                 } else {
                     // 检查OTA地址是否已填写
                     const otaUrlInput = document.getElementById('otaUrl');
@@ -152,8 +152,12 @@ class UIController {
         const closeButtons = document.querySelectorAll('.close-btn');
         closeButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const modal = e.target.closest('.modal');
                 if (modal) {
+                    if (modal.id === 'settingsModal') {
+                        saveConfig();
+                    }
                     this.hideModal(modal.id);
                 }
             });
@@ -172,23 +176,19 @@ class UIController {
         modals.forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
+                    if (modal.id === 'settingsModal') {
+                        saveConfig();
+                    }
                     this.hideModal(modal.id);
                 }
             });
         });
 
-        // 保存配置按钮
-        const saveConfigBtn = document.getElementById('saveConfigBtn');
-        if (saveConfigBtn) {
-            saveConfigBtn.addEventListener('click', () => {
-                this.saveConfig();
-            });
-        }
-
         // 添加MCP工具按钮
         const addMCPToolBtn = document.getElementById('addMCPToolBtn');
         if (addMCPToolBtn) {
-            addMCPToolBtn.addEventListener('click', () => {
+            addMCPToolBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.addMCPTool();
             });
         }
@@ -330,35 +330,14 @@ class UIController {
         }
     }
 
-    // 保存配置
-    saveConfig() {
-        const config = {
-            serverUrl: document.getElementById('serverUrl').value,
-            serverPort: document.getElementById('serverPort').value,
-            audioDevice: document.getElementById('audioDevice').value,
-            audioSampleRate: document.getElementById('audioSampleRate').value,
-            audioChannels: document.getElementById('audioChannels').value
-        };
-
-        saveConfig(config);
-        this.hideModal('settingsModal');
-
-        // 显示保存成功消息
-        this.addChatMessage('配置已保存', false);
-    }
-
-    // 拨号成功后直接开始录音
-    dialAndRecord() {
+    // 连接成功后开始对话
+    startAIChatSession() {
+        this.addChatMessage('连接成功，开始聊天吧~🙂', false);
+        // 开启录音
         const recordBtn = document.getElementById('recordBtn');
-        const wsHandler = getWebSocketHandler();
-        this.wsTimer = setInterval(() => {
-            if (wsHandler.isConnected() && wsHandler.websocket.onopen) {
-                clearInterval(this.wsTimer);
-                this.wsTimer = null;
-                recordBtn.click();
-                return;
-            }
-        }, 500);
+        if (recordBtn) {
+            recordBtn.click();
+        }
     }
 
     // 处理连接按钮点击
@@ -400,21 +379,12 @@ class UIController {
         }
 
         try {
-            // 获取配置信息
-            const config = getConfig();
 
-            // 导入OTA连接器
-            const { webSocketConnect } = await import('../core/network/ota-connector.js');
+            // 获取WebSocket处理器
+            const wsHandler = getWebSocketHandler();
+            const isConnected = await wsHandler.connect();
 
-            // 建立OTA连接
-            const websocket = await webSocketConnect(otaUrl, config);
-
-            if (websocket) {
-                // 获取WebSocket处理器
-                const wsHandler = getWebSocketHandler();
-
-                // 设置WebSocket连接
-                wsHandler.websocket = websocket;
+            if (isConnected) {
 
                 // 设置连接状态回调
                 wsHandler.onConnectionStateChange = (isConnected) => {
@@ -450,16 +420,10 @@ class UIController {
                     dialBtn.disabled = false;
                     dialBtn.querySelector('.btn-text').textContent = '挂断';
                     dialBtn.classList.add('dial-active');
-
-                   this.dialAndRecord();
                 }
 
                 this.hideModal('settingsModal');
 
-                // 自动尝试建立WebSocket连接
-                setTimeout(() => {
-                    wsHandler.connect();
-                }, 1000);
             } else {
                 throw new Error('OTA连接失败');
             }
