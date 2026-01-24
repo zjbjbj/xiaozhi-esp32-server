@@ -83,6 +83,8 @@ public class ShiroConfig {
         filterMap.put("/user/smsVerification", "anon");
         filterMap.put("/user/login", "anon");
         filterMap.put("/user/pub-config", "anon");
+        filterMap.put("/user/miniprogram/jscode2session", "anon");
+        filterMap.put("/user/miniprogram/login", "anon");
         filterMap.put("/user/register", "anon");
         filterMap.put("/user/retrieve-password", "anon");
         // 将config路径使用server服务过滤器

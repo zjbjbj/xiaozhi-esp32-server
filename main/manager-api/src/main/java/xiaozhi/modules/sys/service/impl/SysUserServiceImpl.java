@@ -61,6 +61,18 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     }
 
     @Override
+    public SysUserDTO getByOpenid(String openid) {
+        QueryWrapper<SysUserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("password", openid);
+        List<SysUserEntity> users = sysUserDao.selectList(queryWrapper);
+        if (users == null || users.isEmpty()) {
+            return null;
+        }
+        SysUserEntity entity = users.getFirst();
+        return ConvertUtils.sourceToTarget(entity, SysUserDTO.class);
+    }
+
+    @Override
     public SysUserDTO getByUserId(Long userId) {
         SysUserEntity sysUserEntity = sysUserDao.selectById(userId);
 
@@ -90,6 +102,16 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         }
         entity.setStatus(1);
 
+        insert(entity);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void wxSave(SysUserDTO dto) {
+        SysUserEntity entity = ConvertUtils.sourceToTarget(dto, SysUserEntity.class);
+        entity.setSuperAdmin(SuperAdminEnum.WX.value());
+        entity.setStatus(1);
         insert(entity);
     }
 

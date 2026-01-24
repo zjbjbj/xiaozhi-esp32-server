@@ -15,9 +15,13 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     SysUserDTO getByUsername(String username);
 
+    SysUserDTO getByOpenid(String openid);
+
     SysUserDTO getByUserId(Long userId);
 
     void save(SysUserDTO dto);
+
+    void wxSave(SysUserDTO dto);
 
     /**
      * 删除指定用户，且有关联的数据设备和智能体

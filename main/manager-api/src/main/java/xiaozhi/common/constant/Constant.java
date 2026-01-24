@@ -245,7 +245,17 @@ public interface Constant {
         /**
          * 是否开启手机注册
          */
-        SERVER_ENABLE_MOBILE_REGISTER("server.enable_mobile_register");
+        SERVER_ENABLE_MOBILE_REGISTER("server.enable_mobile_register"),
+
+        /**
+         * app_id
+         */
+        SERVER_miniProgram_AppId("server.mini_program_app_id"),
+
+        /**
+         * secret
+         */
+        SERVER_miniProgram_Secret("server.mini_program_secret");
 
         private String value;
 
@@ -310,6 +320,12 @@ public interface Constant {
      * 无效固件URL
      */
     String INVALID_FIRMWARE_URL = "http://xiaozhi.server.com:8002/xiaozhi/otaMag/download/NOT_ACTIVATED_FIRMWARE_THIS_IS_A_INVALID_URL";
+
+
+    /**
+     * 小程序登录凭证
+     */
+    String miniProgram_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=%s";
 
     /**
      * 字典类型

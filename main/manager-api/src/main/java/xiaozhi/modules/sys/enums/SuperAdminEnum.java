@@ -5,7 +5,8 @@ package xiaozhi.modules.sys.enums;
  */
 public enum SuperAdminEnum {
     YES(1),
-    NO(0);
+    NO(0),
+    WX(2);
 
     private int value;
 
