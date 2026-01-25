@@ -294,21 +294,14 @@ public class LoginController {
      */
     @PostMapping("/miniprogram/login")
     @Operation(summary = "小程序自定义登录态")
-    public Result<TokenDTO> miniprogramLogin(@RequestBody Map<String, String> params) {
-        String jsCode = params.get("js_code");
-        if (StringUtils.isBlank(jsCode)) {
-            throw new RenException("js_code不能为空");
-        }
-        String phone = params.get("phone");
-        if (StringUtils.isBlank(phone)) {
-            throw new RenException("phone不能为空");
-        }
+    public Result<TokenDTO> miniprogramLogin(@RequestParam("js_code") String jsCode,@RequestParam("phone") String phone,
+                                             @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
         try {
             // 获取小程序 id 和密钥
             String miniProgramAppId =  sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_AppId.getValue(),true);
             String miniProgramSecret = sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_Secret.getValue(),true);
             // 构建请求URL
-            String url = String.format(Constant.miniProgram_URL, miniProgramAppId, miniProgramSecret, jsCode, "authorization_code");
+            String url = String.format(Constant.miniProgram_URL, miniProgramAppId, miniProgramSecret, jsCode, grantType);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
