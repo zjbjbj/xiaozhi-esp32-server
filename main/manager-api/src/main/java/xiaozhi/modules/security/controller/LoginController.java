@@ -330,7 +330,9 @@ public class LoginController {
                 userDTO.setRealName("小程序用户"); // 默认昵称
                 sysUserService.wxSave(userDTO);
             }
-
+            if(userDTO.getStatus().equals(0)){
+                throw new RenException("用户已停用: " + userDTO.getUsername());
+            }
             // 创建token
             return sysUserTokenService.createToken(userDTO.getId());
         } catch (Exception e) {
