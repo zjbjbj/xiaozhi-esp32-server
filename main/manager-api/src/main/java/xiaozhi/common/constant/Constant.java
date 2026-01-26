@@ -326,6 +326,8 @@ public interface Constant {
      * 小程序登录凭证
      */
     String miniProgram_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=%s";
+    String miniToken_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s";
+    String miniPhone_URL = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=";
 
     /**
      * 字典类型

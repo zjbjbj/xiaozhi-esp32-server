@@ -323,9 +323,41 @@ public class LoginController {
             // 根据openid查找或创建用户
             SysUserDTO userDTO = sysUserService.getByOpenid(openid);
             if (userDTO == null) {
-                // 如果用户不存在，则创建新用户
+                if(phone==null){
+                    throw new RenException("微信小程序登录失败: 手机号未授权");
+                }
+                // 如果用户不存在，则创建新用户，需要获取用户手机号
+                String getTokenUrl = String.format(Constant.miniToken_URL, miniProgramAppId, miniProgramSecret);
+                HttpRequest requestToken = HttpRequest.newBuilder().uri(URI.create(getTokenUrl)).GET().build();
+                HttpResponse<String> responseToken = client.send(requestToken, HttpResponse.BodyHandlers.ofString());
+                System.out.println(">>> HTTP status = " + responseToken.statusCode());
+                System.out.println(">>> response body = " + responseToken.body());
+                JSONObject tokenJson = new JSONObject(responseToken.body());
+                String accessToken = tokenJson.getStr("access_token");
+                if (accessToken == null) {
+                    throw new RenException("获取微信 access_token 失败: " + tokenJson.getStr("errmsg"));
+                }
+                String phoneUrl = Constant.miniPhone_URL + accessToken;
+                // 构造 POST JSON
+                String phoneRequestBody = "{\"code\":\"" + phone + "\"}";
+
+                HttpRequest phoneRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(phoneUrl))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(phoneRequestBody))
+                        .build();
+
+                HttpResponse<String> phoneResponse = client.send(phoneRequest, HttpResponse.BodyHandlers.ofString());
+                JSONObject phoneJson = new JSONObject(phoneResponse.body());
+                String  phoneNumber = "";
+                if (phoneJson.getInt("errcode") == 0) {
+                  phoneNumber = phoneJson.getJSONObject("phone_info").getStr("phoneNumber");
+                } else {
+                    log.warn("获取手机号失败: {}", phoneJson.getStr("errmsg"));
+                    throw new RenException("获取手机号失败: " +phoneJson.getStr("errmsg"));
+                }
                 userDTO = new SysUserDTO();
-                userDTO.setUsername(ph+phone); // 使用手机号作为用户名
+                userDTO.setUsername(ph+phoneNumber); // 使用手机号作为用户名
                 userDTO.setPassword(openid); // 设置默认密码或随机密码
                 userDTO.setRealName("小程序用户"); // 默认昵称
                 sysUserService.wxSave(userDTO);
