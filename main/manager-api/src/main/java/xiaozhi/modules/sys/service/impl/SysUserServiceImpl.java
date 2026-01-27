@@ -113,6 +113,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         entity.setSuperAdmin(SuperAdminEnum.WX.value());
         entity.setStatus(1);
         insert(entity);
+        dto.setStatus(entity.getStatus());
         dto.setId(entity.getId());
     }
 
