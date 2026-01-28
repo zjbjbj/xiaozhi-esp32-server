@@ -119,6 +119,18 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void wxSavePhone(Long userId, String phone) {
+        if (!isStrongPassword(phone)) {
+            throw new RenException(ErrorCode.NOT_NULL);
+        }
+        SysUserEntity sysUserEntity = new SysUserEntity();
+        sysUserEntity.setId(userId);
+        sysUserEntity.setUsername(phone);
+        updateById(sysUserEntity);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
         // 删除用户
         baseDao.deleteById(id);

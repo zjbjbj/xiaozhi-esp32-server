@@ -23,6 +23,9 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     void wxSave(SysUserDTO dto);
 
+
+    void wxSavePhone(Long userId, String phone);
+
     /**
      * 删除指定用户，且有关联的数据设备和智能体
      * 
