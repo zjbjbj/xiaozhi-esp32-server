@@ -249,7 +249,7 @@ public class LoginController {
     @PostMapping("/miniprogram/jscode2session")
     @Operation(summary = "小程序登录 - 通过code换取session_key和openid")
     public Result jscode2session(@RequestParam("js_code") String jsCode,
-                                                      @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
+                                 @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
         try {
             // 获取小程序 id 和密钥
             String miniProgramAppId =  sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_AppId.getValue(),true);
@@ -294,7 +294,8 @@ public class LoginController {
      */
     @PostMapping("/miniprogram/login")
     @Operation(summary = "小程序自定义登录态")
-    public Result<TokenDTO> miniprogramLogin(@RequestParam("js_code") String jsCode,@RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
+    public Result<TokenDTO> miniprogramLogin(@RequestParam("js_code") String jsCode,@RequestParam("phone") String phone,
+                                             @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
         try {
             // 获取小程序 id 和密钥
             String miniProgramAppId =  sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_AppId.getValue(),true);
@@ -322,43 +323,9 @@ public class LoginController {
             // 根据openid查找或创建用户
             SysUserDTO userDTO = sysUserService.getByOpenid(openid);
             if (userDTO == null) {
-                userDTO = new SysUserDTO();
-                userDTO.setUsername("小程序用户");
-                userDTO.setPassword(openid); // 设置默认密码或随机密码
-                userDTO.setRealName("小程序用户"); // 默认昵称
-                sysUserService.wxSave(userDTO);
-            }
-            if(userDTO.getStatus().equals(0)){
-                throw new RenException("用户已停用: " + userDTO.getUsername());
-            }
-            // 创建token
-            return sysUserTokenService.createToken(userDTO.getId());
-        } catch (Exception e) {
-            log.error("小程序登录异常", e);
-            throw new RenException("小程序登录失败");
-        }
-    }
-
-
-    /**
-     * 小程序登录 - 自定义登录态
-     */
-    @PostMapping("/miniprogram/phone")
-    @Operation(summary = "小程序自定义登录态")
-    public Result<TokenDTO> miniprogramPhone(@RequestParam("phone") String phone) {
-        Long userId = SecurityUser.getUserId();
-        try {
-            // 根据openid查找或创建用户
-            SysUserDTO userDTO = sysUserService.getByUserId(userId);
-            if (userDTO == null) {
                 if(phone==null){
                     throw new RenException("微信小程序登录失败: 手机号未授权");
                 }
-                HttpClient client = HttpClient.newHttpClient();
-                // 获取小程序 id 和密钥
-                String miniProgramAppId =  sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_AppId.getValue(),true);
-                String miniProgramSecret = sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_Secret.getValue(),true);
-
                 // 如果用户不存在，则创建新用户，需要获取用户手机号
                 String getTokenUrl = String.format(Constant.miniToken_URL, miniProgramAppId, miniProgramSecret);
                 HttpRequest requestToken = HttpRequest.newBuilder().uri(URI.create(getTokenUrl)).GET().build();
@@ -389,8 +356,16 @@ public class LoginController {
                     log.warn("获取手机号失败: {}", phoneJson.getStr("errmsg"));
                     throw new RenException("获取手机号失败: " +phoneJson.getStr("errmsg"));
                 }
-                sysUserService.wxSavePhone(userId,ph+phoneNumber);
+                userDTO = new SysUserDTO();
+                userDTO.setUsername(ph+phoneNumber); // 使用手机号作为用户名
+                userDTO.setPassword(openid); // 设置默认密码或随机密码
+                userDTO.setRealName("小程序用户"); // 默认昵称
+                sysUserService.wxSave(userDTO);
             }
+            if(userDTO.getStatus().equals(0)){
+                throw new RenException("用户已停用: " + userDTO.getUsername());
+            }
+            // 创建token
             return sysUserTokenService.createToken(userDTO.getId());
         } catch (Exception e) {
             log.error("小程序登录异常", e);
