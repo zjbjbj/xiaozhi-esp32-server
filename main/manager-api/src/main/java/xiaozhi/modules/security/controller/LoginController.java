@@ -88,21 +88,19 @@ public class LoginController {
     @Operation(summary = "登录")
     public Result<TokenDTO> login(@RequestBody LoginDTO login) {
         String password = login.getPassword();
-        if (password.length() != 28) {
-            // 使用工具类解密并验证验证码
-            String actualPassword = Sm2DecryptUtil.decryptAndValidateCaptcha(
-                    password, login.getCaptchaId(), captchaService, sysParamsService);
+        // 使用工具类解密并验证验证码
+        String actualPassword = Sm2DecryptUtil.decryptAndValidateCaptcha(
+                password, login.getCaptchaId(), captchaService, sysParamsService);
 
-            login.setPassword(actualPassword);
-        }
-
+        login.setPassword(actualPassword);
         // 按照用户名获取用户
         SysUserDTO userDTO = sysUserService.getByUsername(login.getUsername());
         // 判断用户是否存在
         if (userDTO == null) {
             throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
         }
-        if (password.length() == 28) {
+        log.info("login，actualPassword: {}, getPassword: {}", actualPassword, userDTO.getPassword());
+        if (actualPassword.length() == 28) {
             if (!login.getPassword().equals(userDTO.getPassword())) {
                 throw new RenException(ErrorCode.PASSWORD_WEAK_ERROR);
             }
