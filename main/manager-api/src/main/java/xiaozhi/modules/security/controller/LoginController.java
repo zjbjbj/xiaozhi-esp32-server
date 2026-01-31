@@ -88,12 +88,13 @@ public class LoginController {
     @Operation(summary = "登录")
     public Result<TokenDTO> login(@RequestBody LoginDTO login) {
         String password = login.getPassword();
+        if (password.length() != 28) {
+            // 使用工具类解密并验证验证码
+            String actualPassword = Sm2DecryptUtil.decryptAndValidateCaptcha(
+                    password, login.getCaptchaId(), captchaService, sysParamsService);
 
-        // 使用工具类解密并验证验证码
-        String actualPassword = Sm2DecryptUtil.decryptAndValidateCaptcha(
-                password, login.getCaptchaId(), captchaService, sysParamsService);
-
-        login.setPassword(actualPassword);
+            login.setPassword(actualPassword);
+        }
 
         // 按照用户名获取用户
         SysUserDTO userDTO = sysUserService.getByUsername(login.getUsername());
