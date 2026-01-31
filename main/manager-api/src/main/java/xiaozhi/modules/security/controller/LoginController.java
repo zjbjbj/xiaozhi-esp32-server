@@ -246,52 +246,6 @@ public class LoginController {
     }
 
     /**
-     * 小程序登录 - 通过code换取session_key和openid
-     */
-    @PostMapping("/miniprogram/jscode2session")
-    @Operation(summary = "小程序登录 - 通过code换取session_key和openid")
-    public Result jscode2session(@RequestParam("js_code") String jsCode,
-                                 @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType) {
-        try {
-            // 获取小程序 id 和密钥
-            String miniProgramAppId =  sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_AppId.getValue(),true);
-            String miniProgramSecret = sysParamsService.getValue(Constant.SysMSMParam.SERVER_miniProgram_Secret.getValue(),true);
-
-            // 构建请求URL
-            String apiUrl = String.format(Constant.miniProgram_URL, miniProgramAppId, miniProgramSecret, jsCode, grantType);
-
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(">>> HTTP status = " + response.statusCode());
-            System.out.println(">>> response body = " + response.body());
-
-            // 解析响应结果
-            JSONObject jsonNode = new JSONObject(response.body());
-            // 检查是否有错误
-            if (jsonNode.containsKey("errcode")) {
-                int errcode = jsonNode.getInt("errcode");
-                String errmsg = jsonNode.getStr("errmsg");
-                log.error("微信小程序登录失败，错误码: {}, 错误信息: {}", errcode, errmsg);
-                return new Result().error("微信小程序登录失败: " + errmsg);
-            }
-
-            // 返回成功结果
-            Map<String, Object> result = new HashMap<>();
-            result.put("openid", jsonNode.getStr("openid"));
-            result.put("session_key", jsonNode.getStr("session_key"));
-            if (jsonNode.containsKey("unionid")) {
-                result.put("unionid", jsonNode.getStr("unionid"));
-            }
-            return new Result().ok(result);
-        } catch (Exception e) {
-            log.error("调用微信小程序登录接口异常", e);
-            return new Result().error("微信小程序登录失败: ");
-
-        }
-    }
-
-    /**
      * 小程序登录 - 自定义登录态
      */
     @PostMapping("/miniprogram/login")

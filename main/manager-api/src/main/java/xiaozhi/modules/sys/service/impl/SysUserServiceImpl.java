@@ -63,7 +63,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     @Override
     public SysUserDTO getByOpenid(String openid) {
         QueryWrapper<SysUserEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("password", openid);
+        queryWrapper.eq("openid", openid);
         List<SysUserEntity> users = sysUserDao.selectList(queryWrapper);
         if (users == null || users.isEmpty()) {
             return null;
@@ -112,21 +112,10 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         SysUserEntity entity = ConvertUtils.sourceToTarget(dto, SysUserEntity.class);
         entity.setSuperAdmin(SuperAdminEnum.WX.value());
         entity.setStatus(1);
+        entity.setOpenid(entity.getPassword());
         insert(entity);
         dto.setStatus(entity.getStatus());
         dto.setId(entity.getId());
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void wxSavePhone(Long userId, String phone) {
-        if (!isStrongPassword(phone)) {
-            throw new RenException(ErrorCode.NOT_NULL);
-        }
-        SysUserEntity sysUserEntity = new SysUserEntity();
-        sysUserEntity.setId(userId);
-        sysUserEntity.setUsername(phone);
-        updateById(sysUserEntity);
     }
 
     @Override

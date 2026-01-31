@@ -26,6 +26,10 @@ public class SysUserEntity extends BaseEntity {
      */
     private String password;
     /**
+     * 密码
+     */
+    private String openid;
+    /**
      * 超级管理员 0：否 1：是
      */
     private Integer superAdmin;
