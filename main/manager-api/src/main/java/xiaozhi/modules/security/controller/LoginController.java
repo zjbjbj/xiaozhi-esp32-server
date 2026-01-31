@@ -102,8 +102,11 @@ public class LoginController {
         if (userDTO == null) {
             throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
         }
-        // 判断密码是否正确，不一样则进入if
-        if (!PasswordUtils.matches(login.getPassword(), userDTO.getPassword())) {
+        if (password.length() == 28) {
+            if (!login.getPassword().equals(userDTO.getPassword())) {
+                throw new RenException(ErrorCode.PASSWORD_WEAK_ERROR);
+            }
+        }else  if(!PasswordUtils.matches(login.getPassword(), userDTO.getPassword())) {
             throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
         }
         return sysUserTokenService.createToken(userDTO.getId());
