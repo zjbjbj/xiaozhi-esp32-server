@@ -159,9 +159,9 @@ export default {
 
       search: "",
       // 分页相关数据
-      pageSizeOptions: [10, 20, 50, 100],
+      pageSizeOptions: [5 , 10, 20, 50, 100],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 5,
       total: 0,
     };
   },
